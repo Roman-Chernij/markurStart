@@ -1,0 +1,14 @@
+$mobile: 320px;
+$tablet: 768px;
+$desktop: 1025px;
+
+$mob-max: "max-width: $tablet - 1";
+$mob-min: "min-width: $mobile";
+$tab-max: "max-width: $desktop - 1";
+$tab-min: "min-width: $tablet";
+$desk-min: "min-width: $desktop";
+
+$type-1: 'Montserrat Regular';
+$type-2: 'Montserrat Light';
+$type-3: 'Montserrat SemiBold';
+$type-4: 'Montserrat Bold';
