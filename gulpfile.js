@@ -14,6 +14,7 @@
         merge           = require('event-stream').merge;
         order           = require("gulp-order");
         plumber         = require('gulp-plumber');
+        babel           = require('gulp-babel');
 
     //CSS files
 gulp.task('sass', function () {
@@ -42,26 +43,30 @@ gulp.task('sass', function () {
 });
 
 //JavaScript files
-gulp.task('autopolyfiller', function () {
-        return gulp.src('app/js/script.js')
-            .pipe(autopolyfiller('result_polyfill_file.js', {
-                browsers: ['last 10 version', 'ie 9']
+gulp.task('autopolyfiller',['babel'], function () {
+        return gulp.src('app/js/script.babel.js')
+            .pipe(autopolyfiller('polyfill.js', {
+                browsers: require('autoprefixer').default
             }))
             .pipe(gulp.dest('app/js'));
 });
 
-gulp.task('scripts', ['autopolyfiller'], function () {
+gulp.task('babel', function () {
+ return gulp.src('app/js/script.js')
+     .pipe(babel({
+         presets: ['es2015']
+     }))
+     .pipe(rename({suffix: '.babel'}))
+     .pipe(gulp.dest('app/js'))
+});
+
+gulp.task('scripts',['autopolyfiller'], function () {
     return gulp.src([
-        'app/js/*.js',
-        'app/libs/*.js'
+        "app/js/polyfill.js",
+        "app/libs/*.js",
+        "app/js/script.babel.js"
     ])
-        .pipe(order([
-            "js/result_polyfill_file.js",
-            "libs/*.js",
-            "js/*.js",
-            "js/script.js"
-        ]))
-        .pipe(concat('script.js'))
+        .pipe(concat('index.js'))
         .pipe(rename({suffix: '.min'}))
         .pipe(uglify())
         .pipe(gulp.dest('app/dist'))
@@ -87,7 +92,7 @@ gulp.task('img', function() {
                 svgoPlugins: [{removeViewBox: false}],
                 use: [pngquant()]
             })))
-            .pipe(gulp.dest('app/img')); // Выгружаем на продакшен
+            .pipe(gulp.dest('app/img'));
     });
 
 gulp.task('clear', function () {
@@ -123,29 +128,3 @@ gulp.task('watch', ['browserSync', 'sass', 'scripts'], function () {
   //      .pipe(gulp.dest('dist/'));
 
 //});
-
-    /*
-gulp.task('default', function () {
-        // Concat all required js files
-        var all = gulp.src('app/js/*.js')
-            .pipe(concat('all.js'));
-
-        // Generate polyfills for all files
-        var polyfills = all
-            .pipe(autopolyfiller('polyfills.js'));
-
-        // Merge polyfills and all files streams
-        return merge(polyfills, all)
-        // Order files. NB! polyfills MUST be first
-            .pipe(order([
-                'polyfills.js',
-                'all.js'
-            ]))
-            // Make single file
-            .pipe(concat('all.min.js'))
-            // Uglify it
-            .pipe(uglify())
-            // And finally write `all.min.js` into `build/` dir
-            .pipe(gulp.dest('build'));
-});
-    */
