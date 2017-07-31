@@ -52,7 +52,13 @@ gulp.task('autopolyfiller',['babel'], function () {
 });
 
 gulp.task('babel', function () {
- return gulp.src('app/js/script.js')
+ return gulp.src([
+   "app/js/Helper.js",
+   "app/js/Helper1.js",
+   "app/js/App.js",
+   "app/js/components/*.js"
+ ])
+     .pipe(concat('scripts.js'))
      .pipe(babel({
          presets: ['es2015']
      }))
@@ -64,7 +70,7 @@ gulp.task('scripts',['autopolyfiller'], function () {
     return gulp.src([
         "app/js/polyfill.js",
         "app/libs/*.js",
-        "app/js/script.babel.js"
+        "app/js/scripts.babel.js"
     ])
         .pipe(concat('index.js'))
         .pipe(rename({suffix: '.min'}))
@@ -106,7 +112,7 @@ gulp.task('clean', function () {
 gulp.task('watch', ['browserSync', 'sass', 'scripts'], function () {
     gulp.watch('app/scss/**/*.+(scss|sass)' , ['sass']);
     gulp.watch('app/*.html', browserSync.reload);
-    gulp.watch('app/js/*.js', ['scripts']);
+    gulp.watch('app/js/components/*.js', ['scripts']);
     gulp.watch('app/libs/libs.scss', browserSync.reload);
     gulp.watch('app/img/**/*', ['img']);
 });
